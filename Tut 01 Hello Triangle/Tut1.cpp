@@ -84,7 +84,7 @@ const std::string strFragmentShader(
 	"out vec4 outputColor;\n"
 	"void main()\n"
 	"{\n"
-	"   outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
+	"   outputColor = vec4(0.2f, 0.3f, 1.0f, 1.0f);\n"
 	"}\n"
 );
 
@@ -101,9 +101,9 @@ void InitializeProgram()
 }
 
 const float vertexPositions[] = {
-	0.75f, 0.75f, 0.0f, 1.0f,
-	0.75f, -0.75f, 0.0f, 1.0f,
-	-0.75f, -0.75f, 0.0f, 1.0f,
+	0.2f, 0.75f, 0.0f, 1.0f,
+	0.75f, -0.1f, 0.0f, 1.0f,
+	-0.75f, -0.75f, 0.3f, 1.0f,
 };
 
 GLuint positionBufferObject;
@@ -134,7 +134,7 @@ void init()
 //If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
 void display()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 0.1f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(theProgram);
