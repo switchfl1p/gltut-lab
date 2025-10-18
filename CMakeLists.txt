@@ -28,3 +28,5 @@ endforeach()
 
 ## Tutorials
 add_tutorial("Tut 01 Hello Triangle" "Tut01" "Tut1.cpp")
+add_tutorial("Tut 02 Playing with Colors" "Tut02FragPosition" "FragPosition.cpp")
+add_tutorial("Tut 02 Playing with Colors" "Tut02VertexColors" "VertexColors.cpp")
