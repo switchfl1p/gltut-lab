@@ -28,5 +28,11 @@ endforeach()
 
 ## Tutorials
 add_tutorial("Tut 01 Hello Triangle" "Tut01" "Tut1.cpp")
+
 add_tutorial("Tut 02 Playing with Colors" "Tut02FragPosition" "FragPosition.cpp")
 add_tutorial("Tut 02 Playing with Colors" "Tut02VertexColors" "VertexColors.cpp")
+
+add_tutorial("Tut 03 OpenGLs Moving Triangle" "Tut03CPUPositionOffset" "CPUPositionOffset.cpp")
+add_tutorial("Tut 03 OpenGLs Moving Triangle" "Tut03ShaderPositionOffset" "VertPositionOffset.cpp")
+add_tutorial("Tut 03 OpenGLs Moving Triangle" "Tut03ShaderCalcOffset" "VertCalcOffset.cpp")
+add_tutorial("Tut 03 OpenGLs Moving Triangle" "Tut03FragmentChangeColor" "FragChangeColor.cpp")
