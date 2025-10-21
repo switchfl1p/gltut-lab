@@ -75,6 +75,11 @@ void display()
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
+	//send elapsed time + 2.5 uniform
+	//draw arrays again
+	glUniform1f(elapsedTimeUniform, (glutGet(GLUT_ELAPSED_TIME) / 1000.0f) + 2.5);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
 
