@@ -36,3 +36,8 @@ add_tutorial("Tut 03 OpenGLs Moving Triangle" "Tut03CPUPositionOffset" "CPUPosit
 add_tutorial("Tut 03 OpenGLs Moving Triangle" "Tut03ShaderPositionOffset" "VertPositionOffset.cpp")
 add_tutorial("Tut 03 OpenGLs Moving Triangle" "Tut03ShaderCalcOffset" "VertCalcOffset.cpp")
 add_tutorial("Tut 03 OpenGLs Moving Triangle" "Tut03FragmentChangeColor" "FragChangeColor.cpp")
+
+add_tutorial("Tut 04 Objects at Rest" "Tut04OrthographicCube" "OrthoCube.cpp")
+add_tutorial("Tut 04 Objects at Rest" "Tut04ShaderPerspective" "ShaderPerspective.cpp")
+add_tutorial("Tut 04 Objects at Rest" "Tut04MatrixPerspective" "MatrixPerspective.cpp")
+add_tutorial("Tut 04 Objects at Rest" "Tut04AspectRatio" "AspectRatio.cpp")
