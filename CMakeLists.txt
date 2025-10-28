@@ -41,3 +41,11 @@ add_tutorial("Tut 04 Objects at Rest" "Tut04OrthographicCube" "OrthoCube.cpp")
 add_tutorial("Tut 04 Objects at Rest" "Tut04ShaderPerspective" "ShaderPerspective.cpp")
 add_tutorial("Tut 04 Objects at Rest" "Tut04MatrixPerspective" "MatrixPerspective.cpp")
 add_tutorial("Tut 04 Objects at Rest" "Tut04AspectRatio" "AspectRatio.cpp")
+
+add_tutorial("Tut 05 Objects in Depth" "Tut05OverlapNoDepth" "OverlapNoDepth.cpp")
+add_tutorial("Tut 05 Objects in Depth" "Tut05BaseVertexWithOverlap" "BaseVertexOverlap.cpp")
+add_tutorial("Tut 05 Objects in Depth" "Tut05DepthBuffering" "DepthBuffer.cpp")
+add_tutorial("Tut 05 Objects in Depth" "Tut05VertexClipping" "VertexClipping.cpp")
+add_tutorial("Tut 05 Objects in Depth" "Tut05DepthClamping" "DepthClamping.cpp")
+add_tutorial("Tut 05 Objects in Depth" "Tut05DepthFighting" "DepthFighting.cpp")
+
