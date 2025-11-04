@@ -118,6 +118,9 @@ void InitializeVertexBuffer()
 }
 
 //defines 3 offsets for different translation examples
+//what we're doing: computing an offset based on a loop duration
+//what we need to do: create rotation matrices
+//rotation matrices around a particular axis are given in the book
 
 glm::vec3 StationaryOffset(float fElapsedTime){
     return glm::vec3(0.0f, 0.0f, -20.0f);
@@ -172,6 +175,65 @@ Instance g_instanceList[] =
 	{OvalOffset},
 	{BottomCircleOffset},
 };
+
+inline float DegToRad(float fAngDeg)
+{
+	const float fDegToRad = 3.14159f * 2.0f / 360.0f;
+	return fAngDeg * fDegToRad;
+}
+
+//constructing our transform matrices, RotateXYZ/Translate/Scale
+glm::mat4 RotateX(float fAngDeg)
+{
+	float fAngRad = DegToRad(fAngDeg);
+	float fCos = cosf(fAngRad);
+	float fSin = sinf(fAngRad);
+
+	glm::mat4 theMat(1.0f);
+	theMat[1].y = fCos; theMat[2].y = -fSin;
+	theMat[1].z = fSin; theMat[2].z = fCos;
+	return theMat;
+}
+
+glm::mat4 RotateY(float fAngDeg)
+{
+	float fAngRad = DegToRad(fAngDeg);
+	float fCos = cosf(fAngRad);
+	float fSin = sinf(fAngRad);
+
+	glm::mat4 theMat(1.0f);
+	theMat[0].x = fCos; theMat[2].x = fSin;
+	theMat[0].z = -fSin; theMat[2].z = fCos;
+	return theMat;
+}
+
+glm::mat4 RotateZ(float fAngDeg)
+{
+	float fAngRad = DegToRad(fAngDeg);
+	float fCos = cosf(fAngRad);
+	float fSin = sinf(fAngRad);
+
+	glm::mat4 theMat(1.0f);
+	theMat[0].x = fCos; theMat[1].x = -fSin;
+	theMat[0].y = fSin; theMat[1].y = fCos;
+	return theMat;
+}
+
+glm::mat4 Translate(const glm::vec3 &offsetVec){
+	glm::mat4 translateMat(1.0f);
+	translateMat[3] = glm::vec4(offsetVec, 1.0f);
+	return translateMat;
+}
+
+glm::mat4 Scale(const glm::vec3 &scaleVec)
+{
+	glm::mat4 scaleMat(1.0f);
+	scaleMat[0].x = scaleVec.x;
+	scaleMat[1].y = scaleVec.y;
+	scaleMat[2].z = scaleVec.z;
+
+	return scaleMat;
+}
 
 //Called after the window and OpenGL are initialized. Called exactly once, before the main loop.
 void init(){
