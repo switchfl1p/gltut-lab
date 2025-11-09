@@ -53,4 +53,4 @@ add_tutorial("Tut 06 Objects in Motion" "Tut06Translation" "Translation.cpp")
 add_tutorial("Tut 06 Objects in Motion" "Tut06Scale" "Scale.cpp")
 add_tutorial("Tut 06 Objects in Motion" "Tut06Rotations" "Rotations.cpp")
 add_tutorial("Tut 06 Objects in Motion" "Tut06Hierarchy" "Hierarchy.cpp")
-
+add_tutorial("Tut 06 Objects in Motion" "Practice" "Practice.cpp")
