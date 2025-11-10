@@ -566,7 +566,6 @@ private:
 	float			angLowerFinger;
 };
 
-
 Hierarchy g_armature;
 
 //Called after the window and OpenGL are initialized. Called exactly once, before the main loop.
