@@ -310,22 +310,22 @@ private:
 class Node
 {
 public:
-    Node();
+    Node(MatrixStack *m_stackParam, glm::vec3 angleParam, glm::vec3 scaleParam, glm::vec3 posParam, bool drawParam)
+	: m_stack(m_stackParam),
+	angle(angleParam),
+	scale(scaleParam),
+	position(posParam),
+	drawBool(drawParam){};
 
 	//recursive render function
     void renderNode(){
-		m_stack->Translate(position);
-		if (angle.x != 0) {
-			m_stack->RotateX(angle.x);
-		}
-		if (angle.y != 0){
-			m_stack->RotateY(angle.y);
-		}
-		if (angle.z != 0){
-			m_stack->RotateZ(angle.z);
-		}
-		m_stack->Scale(scale);
+		
 		m_stack->Push();
+		m_stack->Translate(position);
+		if (angle.x != 0) m_stack->RotateX(angle.x);
+		if (angle.y != 0) m_stack->RotateY(angle.y);
+		if (angle.z != 0) m_stack->RotateZ(angle.z);
+		m_stack->Scale(scale);
 
 		//if the node needs to be drawn
 		if (drawBool) {
@@ -335,9 +335,10 @@ public:
 			glDrawElements(GL_TRIANGLES, ARRAY_COUNT(indexData), GL_UNSIGNED_SHORT, 0);
 			glBindVertexArray(0);
 			glUseProgram(0);
+			m_stack->Pop();
 		}
 
-		m_stack->Pop();
+		//if(this->position != glm::vec3(3.0f, -5.0f, -40.0f)) m_stack->Pop();
 
 		//Stopping Condition: Node has no children
 		if (children.empty()) {
@@ -347,6 +348,8 @@ public:
 		for (Node* n : children){
 			n->renderNode();
 		}
+
+		m_stack->Pop();
 	}
 
 	void attachChild(Node *child){
@@ -361,3 +364,317 @@ private:
     glm::vec3 position;
 	bool drawBool; //tells us weather to draw the node or not
 };
+
+struct SceneData{
+	SceneData()
+		: posBase(glm::vec3(3.0f, -5.0f, -40.0f))
+		, angBase(-45.0f)
+		, posBaseLeft(glm::vec3(2.0f, 0.0f, 0.0f))
+		, posBaseRight(glm::vec3(-2.0f, 0.0f, 0.0f))
+		, scaleBaseZ(3.0f)
+		, angUpperArm(-33.75f)
+		, sizeUpperArm(9.0f)
+		, posLowerArm(glm::vec3(0.0f, 0.0f, 8.0f))
+		, angLowerArm(146.25f)
+		, lenLowerArm(5.0f)
+		, widthLowerArm(1.5f)
+		, posWrist(glm::vec3(0.0f, 0.0f, 5.0f))
+		, angWristRoll(0.0f)
+		, angWristPitch(67.5f)
+		, lenWrist(2.0f)
+		, widthWrist(2.0f)
+		, posLeftFinger(glm::vec3(1.0f, 0.0f, 1.0f))
+		, posRightFinger(glm::vec3(-1.0f, 0.0f, 1.0f))
+		, angFingerOpen(180.0f)
+		, lenFinger(2.0f)
+		, widthFinger(0.5f)
+		, angLowerFinger(45.0f)
+	{}
+
+	void renderScene(){
+		glm::vec3 noScale(1.0f, 1.0f, 1.0f);
+		glm::vec3 noRotation(0.0f, 0.0f, 0.0f);
+		glm::vec3 noTranslation(0.0f, 0.0f, 0.0f);
+
+		MatrixStack modelToCameraStack;
+
+		Node baseNode(&modelToCameraStack, 
+			glm::vec3(0.0f,angBase, 0.0f),
+			noScale,
+			posBase,
+			false);
+		
+		Node leftBase(&modelToCameraStack, 
+			noRotation,
+			glm::vec3(1.0f, 1.0f, scaleBaseZ),
+			posBaseLeft,
+			true);
+		
+		Node rightBase(&modelToCameraStack, 
+			noRotation,
+			glm::vec3(1.0f, 1.0f, scaleBaseZ),
+			posBaseRight,
+			true);
+		
+		Node upperArmNode(&modelToCameraStack, 
+			glm::vec3(angUpperArm,0.0f, 0.0f),
+			noScale,
+			noTranslation,
+			false);
+		
+		Node upperArmDraw(&modelToCameraStack, 
+			noRotation,
+			glm::vec3(1.0f, 1.0f, sizeUpperArm / 2.0f),
+			glm::vec3(0.0f, 0.0f, (sizeUpperArm / 2.0f) - 1.0f),
+			true);
+		
+		Node lowerArmNode(&modelToCameraStack, 
+			glm::vec3(angLowerArm,0.0f, 0.0f),
+			noScale,
+			posLowerArm,
+			false);
+		
+		Node lowerArmDraw(&modelToCameraStack, 
+			noRotation,
+			glm::vec3(widthLowerArm / 2.0f, widthLowerArm / 2.0f, lenLowerArm / 2.0f),
+			glm::vec3(0.0f, 0.0f, lenLowerArm / 2.0f),
+			true);
+		
+		Node wristNode(&modelToCameraStack, 
+			glm::vec3(angWristPitch,0.0f, angWristRoll),
+			noScale,
+			posWrist,
+			false);
+		
+		Node wristDraw(&modelToCameraStack, 
+			noRotation,
+			glm::vec3(widthWrist / 2.0f, widthWrist/ 2.0f, lenWrist / 2.0f),
+			noTranslation,
+			true);
+		
+		Node leftFingerNode(&modelToCameraStack, 
+			glm::vec3(0.0f, angFingerOpen, 0.0f),
+			noScale,
+			posLeftFinger,
+			false);
+
+		Node rightFingerNode(&modelToCameraStack, 
+			glm::vec3(0.0f, -angFingerOpen, 0.0f),
+			noScale,
+			posRightFinger,
+			false);
+		
+		Node leftUpperFingerDraw(&modelToCameraStack, 
+			noRotation,
+			glm::vec3(glm::vec3(widthFinger / 2.0f, widthFinger/ 2.0f, lenFinger / 2.0f)),
+			glm::vec3(0.0f, 0.0f, lenFinger / 2.0f),
+			true);
+		
+		Node leftLowerFingerNode(&modelToCameraStack, 
+			glm::vec3(0.0f, -angLowerFinger, 0.0f),
+			noScale,
+			glm::vec3(0.0f, 0.0f, lenFinger),
+			false);
+
+		Node leftLowerFingerDraw(&modelToCameraStack, 
+			noRotation,
+			glm::vec3(widthFinger / 2.0f, widthFinger/ 2.0f, lenFinger / 2.0f),
+			glm::vec3(0.0f, 0.0f, lenFinger / 2.0f),
+			true);
+		
+		Node rightUpperFingerDraw(&modelToCameraStack, 
+			noRotation,
+			glm::vec3(widthFinger / 2.0f, widthFinger/ 2.0f, lenFinger / 2.0f),
+			glm::vec3(0.0f, 0.0f, lenFinger / 2.0f),
+			true);
+		
+		Node rightLowerFingerNode(&modelToCameraStack, 
+			glm::vec3(0.0f, angLowerFinger, 0.0f),
+			noScale,
+			glm::vec3(0.0f, 0.0f, lenFinger),
+			false);
+		
+		Node rightLowerFingerDraw(&modelToCameraStack, 
+			noRotation,
+			glm::vec3(widthFinger / 2.0f, widthFinger/ 2.0f, lenFinger / 2.0f),
+			glm::vec3(0.0f, 0.0f, lenFinger / 2.0f),
+			true);
+		
+		baseNode.attachChild(&leftBase);
+		baseNode.attachChild(&rightBase);
+		baseNode.attachChild(&upperArmNode);
+
+		upperArmNode.attachChild(&upperArmDraw);
+		upperArmNode.attachChild(&lowerArmNode);
+
+		lowerArmNode.attachChild(&lowerArmDraw);
+		lowerArmNode.attachChild(&wristNode);
+
+		wristNode.attachChild(&wristDraw);
+		wristNode.attachChild(&leftFingerNode);
+		wristNode.attachChild(&rightFingerNode);
+
+		leftFingerNode.attachChild(&leftUpperFingerDraw);
+		leftFingerNode.attachChild(&leftLowerFingerNode);
+		
+		leftLowerFingerNode.attachChild(&leftLowerFingerDraw);
+
+		rightFingerNode.attachChild(&rightUpperFingerDraw);
+		rightFingerNode.attachChild(&rightLowerFingerNode);
+
+		rightLowerFingerNode.attachChild(&rightLowerFingerDraw);
+
+		baseNode.renderNode();
+	}
+
+	#define STANDARD_ANGLE_INCREMENT 11.25f
+	#define SMALL_ANGLE_INCREMENT 9.0f
+
+	void AdjBase(bool bIncrement)
+	{
+		angBase += bIncrement ? STANDARD_ANGLE_INCREMENT : -STANDARD_ANGLE_INCREMENT;
+		angBase = fmodf(angBase, 360.0f);
+	}
+
+	void AdjUpperArm(bool bIncrement)
+	{
+		angUpperArm += bIncrement ? STANDARD_ANGLE_INCREMENT : -STANDARD_ANGLE_INCREMENT;
+		angUpperArm = Clamp(angUpperArm, -90.0f, 0.0f);
+	}
+
+	void AdjLowerArm(bool bIncrement)
+	{
+		angLowerArm += bIncrement ? STANDARD_ANGLE_INCREMENT : -STANDARD_ANGLE_INCREMENT;
+		angLowerArm = Clamp(angLowerArm, 0.0f, 146.25f);
+	}
+
+	void AdjWristPitch(bool bIncrement)
+	{
+		angWristPitch += bIncrement ? STANDARD_ANGLE_INCREMENT : -STANDARD_ANGLE_INCREMENT;
+		angWristPitch = Clamp(angWristPitch, 0.0f, 90.0f);
+	}
+
+	void AdjWristRoll(bool bIncrement)
+	{
+		angWristRoll += bIncrement ? STANDARD_ANGLE_INCREMENT : -STANDARD_ANGLE_INCREMENT;
+		angWristRoll = fmodf(angWristRoll, 360.0f);
+	}
+
+	void AdjFingerOpen(bool bIncrement)
+	{
+		angFingerOpen += bIncrement ? SMALL_ANGLE_INCREMENT : -SMALL_ANGLE_INCREMENT;
+		angFingerOpen = Clamp(angFingerOpen, 9.0f, 180.0f);
+	}
+
+	void WritePose()
+	{
+		printf("angBase:\t%f\n", angBase);
+		printf("angUpperArm:\t%f\n", angUpperArm);
+		printf("angLowerArm:\t%f\n", angLowerArm);
+		printf("angWristPitch:\t%f\n", angWristPitch);
+		printf("angWristRoll:\t%f\n", angWristRoll);
+		printf("angFingerOpen:\t%f\n", angFingerOpen);
+		printf("\n");
+	}
+
+private:
+	glm::vec3		posBase;
+	float			angBase;
+
+	glm::vec3		posBaseLeft, posBaseRight;
+	float			scaleBaseZ;
+
+	float			angUpperArm;
+	float			sizeUpperArm;
+
+	glm::vec3		posLowerArm;
+	float			angLowerArm;
+	float			lenLowerArm;
+	float			widthLowerArm;
+
+	glm::vec3		posWrist;
+	float			angWristRoll;
+	float			angWristPitch;
+	float			lenWrist;
+	float			widthWrist;
+
+	glm::vec3		posLeftFinger, posRightFinger;
+	float			angFingerOpen;
+	float			lenFinger;
+	float			widthFinger;
+	float			angLowerFinger;
+};
+
+SceneData scene;
+
+//Called after the window and OpenGL are initialized. Called exactly once, before the main loop.
+void init()
+{
+	InitializeProgram();
+	InitializeVAO();
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CW);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LEQUAL);
+	glDepthRange(0.0f, 1.0f);
+}
+
+//Called to update the display.
+//You should call glutSwapBuffers after all of your rendering to display what you rendered.
+//If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
+void display()
+{
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearDepth(1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	scene.renderScene();
+
+	glutSwapBuffers();
+	glutPostRedisplay();
+}
+
+//Called whenever the window is resized. The new window size is given, in pixels.
+//This is an opportunity to call glViewport or glScissor to keep up with the change in size.
+void reshape (int w, int h)
+{
+	cameraToClipMatrix[0].x = fFrustumScale * (h / (float)w);
+	cameraToClipMatrix[1].y = fFrustumScale;
+
+	glUseProgram(theProgram);
+	glUniformMatrix4fv(cameraToClipMatrixUnif, 1, GL_FALSE, glm::value_ptr(cameraToClipMatrix));
+	glUseProgram(0);
+
+	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+	case 27:
+		glutLeaveMainLoop();
+		return;
+	case 'a': scene.AdjBase(true); break;
+	case 'd': scene.AdjBase(false); break;
+	case 'w': scene.AdjUpperArm(false); break;
+	case 's': scene.AdjUpperArm(true); break;
+	case 'r': scene.AdjLowerArm(false); break;
+	case 'f': scene.AdjLowerArm(true); break;
+	case 't': scene.AdjWristPitch(false); break;
+	case 'g': scene.AdjWristPitch(true); break;
+	case 'z': scene.AdjWristRoll(true); break;
+	case 'c': scene.AdjWristRoll(false); break;
+	case 'q': scene.AdjFingerOpen(true); break;
+	case 'e': scene.AdjFingerOpen(false); break;
+	case 32: scene.WritePose(); break;
+	}
+}
+
+
+unsigned int defaults(unsigned int displayMode, int &width, int &height) {return displayMode;}
+
