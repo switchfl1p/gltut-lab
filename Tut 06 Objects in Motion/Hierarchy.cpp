@@ -33,8 +33,8 @@ void InitializeProgram()
 {
 	std::vector<GLuint> shaderList;
 
-	shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "PosColorLocalTransform.vert"));
-	shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "ColorPassthrough.frag"));
+	shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "Tut06PosColorLocalTransform.vert"));
+	shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "Tut06ColorPassthrough.frag"));
 
 	theProgram = Framework::CreateProgram(shaderList);
 

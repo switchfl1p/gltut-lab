@@ -56,3 +56,6 @@ add_tutorial("Tut 06 Objects in Motion" "Tut06Hierarchy" "Hierarchy.cpp")
 add_tutorial("Tut 06 Objects in Motion" "Practice" "Practice.cpp")
 add_tutorial("Tut 06 Objects in Motion" "HierarchyRewritten" "HierarchyRewritten.cpp")
 add_tutorial("Tut 06 Objects in Motion" "HierarchyNoMStack" "HierarchyNoMStack.cpp")
+
+add_tutorial("Tut 07 World in Motion" "Tut07WorldScene" "WorldScene.cpp")
+add_tutorial("Tut 07 World in Motion" "Tut07WorldWithUBO" "WorldWithUBO.cpp")
