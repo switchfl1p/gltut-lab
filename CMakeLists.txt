@@ -59,3 +59,4 @@ add_tutorial("Tut 06 Objects in Motion" "HierarchyNoMStack" "HierarchyNoMStack.c
 
 add_tutorial("Tut 07 World in Motion" "Tut07WorldScene" "WorldScene.cpp")
 add_tutorial("Tut 07 World in Motion" "Tut07WorldWithUBO" "WorldWithUBO.cpp")
+add_tutorial("Tut 07 World in Motion" "FoldedMatrix" "FoldedMatrix.cpp")
