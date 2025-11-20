@@ -53,9 +53,9 @@ ProgramData LoadProgram(const std::string &strVertexShader, const std::string &s
 
 void InitializeProgram()
 {
-	UniformColor = LoadProgram("Tut07PosOnlyWorldTransformUBO.vert", "ColorUniform.frag");
-	ObjectColor = LoadProgram("Tut07PosColorWorldTransformUBO.vert", "ColorPassthrough.frag");
-	UniformColorTint = LoadProgram("Tut07PosColorWorldTransformUBO.vert", "ColorMultUniform.frag");
+	UniformColor = LoadProgram("Tut072PosOnlyWorldTransformUBO.vert", "Tut072ColorUniform.frag");
+	ObjectColor = LoadProgram("Tut072PosColorWorldTransformUBO.vert", "Tut072ColorPassthrough.frag");
+	UniformColorTint = LoadProgram("Tut072PosColorWorldTransformUBO.vert", "Tut072ColorMultUniform.frag");
 
 	glGenBuffers(1, &g_GlobalMatricesUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, g_GlobalMatricesUBO);
@@ -478,31 +478,20 @@ void display()
 	glClearDepth(1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	float w = glutGet(GLUT_WINDOW_WIDTH);
-	float h = glutGet(GLUT_WINDOW_HEIGHT);
-
 	if(g_pConeMesh && g_pCylinderMesh && g_pCubeTintMesh && g_pCubeColorMesh && g_pPlaneMesh)
 	{
-		// folds the world to camera matrix into the perspective matrix (cameratoclipmatrix) thus creating a worldtoclip matrix
-		const glm::vec3 &camPos = ResolveCamPosition();
-		glutil::MatrixStack persMatrix;
-		persMatrix.Perspective(45.0f, (w / (float)h), g_fzNear, g_fzFar);
-
-		glm::mat4 worldToCameraMatrix = CalcLookAtMatrix(camPos, g_camTarget, glm::vec3(0.0f, 1.0f, 0.0f));
-
-		glutil::PushStack push(persMatrix);
-		persMatrix.ApplyMatrix(worldToCameraMatrix);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, g_GlobalMatricesUBO);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(persMatrix.Top()));
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
 		glutil::MatrixStack modelMatrix;
+		const glm::vec3 &camPos = ResolveCamPosition();
+		glm::mat4 worldtoCameraMatrix = CalcLookAtMatrix(camPos, g_camTarget, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		//worldtoCameraMatrix
+		glutil::PushStack push(modelMatrix);
+		modelMatrix.ApplyMatrix(worldtoCameraMatrix);
 
 		//Render the ground plane.
 		{
 			glutil::PushStack push(modelMatrix);
-
+			
 			modelMatrix.Scale(glm::vec3(100.0f, 1.0f, 100.0f));
 
 			glUseProgram(UniformColor.theProgram);
@@ -547,6 +536,13 @@ void display()
 //This is an opportunity to call glViewport or glScissor to keep up with the change in size.
 void reshape (int w, int h)
 {
+	glutil::MatrixStack persMatrix;
+	persMatrix.Perspective(45.0f, (w / (float)h), g_fzNear, g_fzFar);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, g_GlobalMatricesUBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(persMatrix.Top()));
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 	glutPostRedisplay();
 }
