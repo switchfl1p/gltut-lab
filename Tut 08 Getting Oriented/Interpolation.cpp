@@ -38,8 +38,8 @@ void InitializeProgram()
 {
 	std::vector<GLuint> shaderList;
 
-	shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "PosColorLocalTransform.vert"));
-	shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "ColorMultUniform.frag"));
+	shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "Tut08PosColorLocalTransform.vert"));
+	shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "Tut08ColorMultUniform.frag"));
 
 	theProgram = Framework::CreateProgram(shaderList);
 
