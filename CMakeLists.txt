@@ -67,3 +67,7 @@ add_tutorial("Tut 08 Getting Oriented" "Tut08QuaternionYPR" "QuaternionYPR.cpp")
 add_tutorial("Tut 08 Getting Oriented" "Tut08CameraRelative" "CameraRelative.cpp")
 add_tutorial("Tut 08 Getting Oriented" "Tut08Interpolation" "Interpolation.cpp")
 add_tutorial("Tut 08 Getting Oriented" "Tut08Ex1" "Ex1.cpp")
+
+add_tutorial("Tut 09 Lights on" "Tut09BasicLighting" "BasicLighting.cpp")
+add_tutorial("Tut 09 Lights on" "Tut09ScaleAndLighting" "ScaleAndLighting.cpp")
+add_tutorial("Tut 09 Lights on" "Tut09AmbientLighting" "AmbientLighting.cpp")
