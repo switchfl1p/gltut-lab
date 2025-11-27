@@ -126,135 +126,157 @@ glm::vec4 Vectorize(const glm::fquat theQuat)
 	return ret;
 }
 
-glm::fquat Lerp(const glm::fquat &v0, const glm::fquat &v1, float alpha)
+glm::fquat Lerp(const glm::fquat &v0, const glm::fquat &v1, float alpha, bool useShortPath = true)
 {
-	glm::vec4 start = Vectorize(v0);
-	glm::vec4 end = Vectorize(v1);
-	glm::vec4 interp = glm::mix(start, end, alpha);
-
-	printf("alpha: %f, (%f, %f, %f, %f)\n", alpha, interp.w, interp.x, interp.y, interp.z);
-
-	interp = glm::normalize(interp);
-	return glm::fquat(interp.w, interp.x, interp.y, interp.z);
+    glm::fquat start = v0;
+    glm::fquat end = v1;
+    
+    if (useShortPath) {
+        // Choose the representation that gives the shortest path
+        if (glm::dot(v0, v1) < 0.0f) {
+            end = -v1;
+        }
+    }
+    
+    glm::vec4 startVec = Vectorize(start);
+    glm::vec4 endVec = Vectorize(end);
+    glm::vec4 interp = glm::mix(startVec, endVec, alpha);
+    
+    printf("alpha: %f, (%f, %f, %f, %f)\n", alpha, interp.w, interp.x, interp.y, interp.z);
+    
+    interp = glm::normalize(interp);
+    return glm::fquat(interp.w, interp.x, interp.y, interp.z);
 }
 
-glm::fquat Slerp(const glm::fquat &v0, const glm::fquat &v1, float alpha)
+glm::fquat Slerp(const glm::fquat &v0, const glm::fquat &v1, float alpha, bool useShortPath = true)
 {
-	float dot = glm::dot(v0, v1);
-
-	const float DOT_THRESHOLD = 0.9995f;
-	if (dot > DOT_THRESHOLD)
-		return Lerp(v0, v1, alpha);
-
-	glm::clamp(dot, -1.0f, 1.0f);
-	float theta_0 = acosf(dot);
-	float theta = theta_0*alpha;
-
-	glm::fquat v2 = v1 + -(v0*dot);
-	v2 = glm::normalize(v2);
-
-	return v0*cos(theta) + v2*sin(theta);
+    glm::fquat start = v0;
+    glm::fquat end = v1;
+    
+    float dot = glm::dot(start, end);
+    
+    if (useShortPath && dot < 0.0f) {
+        // Use the short path by negating one quaternion
+        end = -end;
+        dot = -dot;
+    }
+    
+    const float DOT_THRESHOLD = 0.9995f;
+    if (dot > DOT_THRESHOLD)
+        return Lerp(start, end, alpha, useShortPath);
+    
+    dot = glm::clamp(dot, -1.0f, 1.0f);
+    float theta_0 = acosf(dot);
+    float theta = theta_0 * alpha;
+    
+    // Corrected line: use multiplication instead of addition
+    glm::fquat relative = end * glm::inverse(start);
+    relative = glm::normalize(relative);
+    
+    return start * glm::fquat(cos(theta), sin(theta) * relative.x, sin(theta) * relative.y, sin(theta) * relative.z);
 }
 
 class Orientation
 {
 public:
-	Orientation()
-		: m_bIsAnimating(false)
-		, m_ixCurrOrient(0)
-		, m_bSlerp(false)
-	{
-	}
+    Orientation()
+        : m_ixCurrOrient(0)
+        , m_bSlerp(false)
+        , m_bUseShortPath(true)  // Default to short path
+    {
+    }
 
-	bool ToggleSlerp()
-	{
-		m_bSlerp = !m_bSlerp;
-		return m_bSlerp;
-	}
+    bool ToggleSlerp()
+    {
+        m_bSlerp = !m_bSlerp;
+        return m_bSlerp;
+    }
 
-	glm::fquat GetOrient() const
-	{
-		if(m_bIsAnimating)
-			return animDeque.front().GetOrient(g_Orients[m_ixCurrOrient], m_bSlerp);
-		else
-			return g_Orients[m_ixCurrOrient];
-	}
+    bool TogglePath()
+    {
+        m_bUseShortPath = !m_bUseShortPath;
+        return m_bUseShortPath;
+    }
 
-	bool IsAnimating() const {return m_bIsAnimating;}
+    glm::fquat GetOrient() const
+    {
+        glm::fquat result = g_Orients[m_ixCurrOrient];
+        for (const auto& anim : animDeque) {
+            result = anim.GetOrient(result, m_bSlerp, m_bUseShortPath);
+        }
 
-	void UpdateTime()
-	{
-		if(m_bIsAnimating)
-		{
-			bool bIsFinished = animDeque.front().UpdateTime();
-			if(bIsFinished)
-			{
-				m_bIsAnimating = false;
-				m_ixCurrOrient = animDeque.front().GetFinalIx();
-				animDeque.pop_front();
-			}
-		}
-	}
+        return result;
+    }
 
-	void AnimateToOrient(int ixDestination)
-	{
-		if(m_ixCurrOrient == ixDestination)
-			return;
+    bool IsAnimating() const {return !animDeque.empty();}
 
-		Animation anim(m_ixCurrOrient);
-		animDeque.push_back(anim);
+    void UpdateTime()
+    {
+        // Update all animations and remove finished ones
+        auto it = animDeque.begin();
+        while (it != animDeque.end()) {
+            bool bIsFinished = it->UpdateTime();
+            if (bIsFinished) {
+                // When an animation finishes, update the base orientation
+                m_ixCurrOrient = it->GetFinalIx();
+                it = animDeque.erase(it); // Remove finished animation
+            } else {
+                ++it;
+            }
+        }
+    }
 
-		animDeque.front().StartAnimation(ixDestination, 1.0f);
-		m_bIsAnimating = true;
-	}
+    void AnimateToOrient(int ixDestination)
+    {
+        if (animDeque.empty() && m_ixCurrOrient == ixDestination)
+            return;
+
+        Animation newAnim;
+        newAnim.StartAnimation(ixDestination, 1.0f);
+        animDeque.push_back(newAnim);
+    }
+
+    bool IsUsingShortPath() const { return m_bUseShortPath; }
 
 private:
-	class Animation
-	{
-	public:
-		Animation(int final) : m_ixFinalOrient(final){}
+    class Animation
+    {
+    public:
+        //Returns true if the animation is over.
+        bool UpdateTime()
+        {
+            return m_currTimer.Update();
+        }
 
-		//Animation(const Animation& anim) : m_ixFinalOrient(anim.m_ixFinalOrient), m_currTimer(anim.m_currTimer){}
+        glm::fquat GetOrient(const glm::fquat &initial, bool bSlerp, bool useShortPath) const
+        {
+            if(bSlerp)
+            {
+                return Slerp(initial, g_Orients[m_ixFinalOrient], m_currTimer.GetAlpha(), useShortPath);
+            }
+            else
+            {
+                return Lerp(initial, g_Orients[m_ixFinalOrient], m_currTimer.GetAlpha(), useShortPath);
+            }
+        }
 
-		//Returns true if the animation is over.
-		bool UpdateTime()
-		{
-			return m_currTimer.Update();
-		}
+        void StartAnimation(int ixDestination, float fDuration)
+        {
+            m_ixFinalOrient = ixDestination;
+            m_currTimer = Framework::Timer(Framework::Timer::TT_SINGLE, fDuration);
+        }
 
-		glm::fquat GetOrient(const glm::fquat &initial, bool bSlerp) const
-		{
-			if(bSlerp)
-			{
-				return Slerp(initial, g_Orients[m_ixFinalOrient], m_currTimer.GetAlpha());
-			}
-			else
-			{
-				return Lerp(initial, g_Orients[m_ixFinalOrient], m_currTimer.GetAlpha());
-			}
+        int GetFinalIx() const {return m_ixFinalOrient;}
 
-			return initial;
-		}
+    private:
+        int m_ixFinalOrient;
+        Framework::Timer m_currTimer;
+    };
 
-		void StartAnimation(int ixDestination, float fDuration)
-		{
-			m_ixFinalOrient = ixDestination;
-			m_currTimer = Framework::Timer(Framework::Timer::TT_SINGLE, fDuration);
-		}
-
-		int GetFinalIx() const {return m_ixFinalOrient;}
-
-	private:
-		int m_ixFinalOrient;
-		Framework::Timer m_currTimer;
-	};
-
-	bool m_bIsAnimating;
-	int m_ixCurrOrient;
-	bool m_bSlerp;
-
-    std::deque<Orientation::Animation> animDeque;
-
+    int m_ixCurrOrient;
+    bool m_bSlerp;
+    bool m_bUseShortPath;  // New member to track path choice
+    std::deque<Animation> animDeque;
 };
 
 Orientation g_orient;
@@ -305,8 +327,8 @@ void reshape (int w, int h)
 
 void ApplyOrientation(int iIndex)
 {
-	if(!g_orient.IsAnimating())
-		g_orient.AnimateToOrient(iIndex);
+	
+	g_orient.AnimateToOrient(iIndex);
 }
 
 
@@ -316,25 +338,31 @@ void ApplyOrientation(int iIndex)
 //exit the program.
 void keyboard(unsigned char key, int x, int y)
 {
-	switch (key)
-	{
-	case 27:
-		glutLeaveMainLoop();
-		return;
-	case 32:
-		{
-			bool bSlerp = g_orient.ToggleSlerp();
-			printf(bSlerp ? "Slerp\n" : "Lerp\n");
-		}
-		break;
-	}
+    switch (key)
+    {
+    case 27:
+        glutLeaveMainLoop();
+        return;
+    case 32:  // Space bar - toggle interpolation type
+        {
+            bool bSlerp = g_orient.ToggleSlerp();
+            printf(bSlerp ? "Slerp\n" : "Lerp\n");
+        }
+        break;
+    case 'p':  // 'p' key - toggle between short and long path
+    case 'P':
+        {
+            bool bShortPath = g_orient.TogglePath();
+            printf(bShortPath ? "Short path\n" : "Long path\n");
+        }
+        break;
+    }
 
-	for(int iOrient = 0; iOrient < ARRAY_COUNT(g_OrientKeys); iOrient++)
-	{
-		if(key == g_OrientKeys[iOrient])
-			ApplyOrientation(iOrient);
-	}
+    for(int iOrient = 0; iOrient < ARRAY_COUNT(g_OrientKeys); iOrient++)
+    {
+        if(key == g_OrientKeys[iOrient])
+            ApplyOrientation(iOrient);
+    }
 }
-
 
 unsigned int defaults(unsigned int displayMode, int &width, int &height) {return displayMode;}
