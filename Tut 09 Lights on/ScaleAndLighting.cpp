@@ -55,8 +55,8 @@ ProgramData LoadProgram(const std::string &strVertexShader, const std::string &s
 
 void InitializeProgram()
 {
-	g_WhiteDiffuseColor = LoadProgram("DirVertexLighting_PN.vert", "ColorPassthrough.frag");
-	g_VertexDiffuseColor = LoadProgram("DirVertexLighting_PCN.vert", "ColorPassthrough.frag");
+	g_WhiteDiffuseColor = LoadProgram("DirVertexLighting_PN.vert", "Tut09ColorPassthrough.frag");
+	g_VertexDiffuseColor = LoadProgram("DirVertexLighting_PCN.vert", "Tut09ColorPassthrough.frag");
 }
 
 Framework::Mesh *g_pCylinderMesh = NULL;
@@ -130,8 +130,8 @@ void init()
 
 	try
 	{
-		g_pCylinderMesh = new Framework::Mesh("UnitCylinder.xml");
-		g_pPlaneMesh = new Framework::Mesh("LargePlane.xml");
+		g_pCylinderMesh = new Framework::Mesh("Tut09UnitCylinder.xml");
+		g_pPlaneMesh = new Framework::Mesh("Tut09LargePlane.xml");
 	}
 	catch(std::exception &except)
 	{

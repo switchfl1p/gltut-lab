@@ -59,10 +59,10 @@ ProgramData LoadProgram(const std::string &strVertexShader, const std::string &s
 
 void InitializeProgram()
 {
-	g_WhiteDiffuseColor = LoadProgram("DirVertexLighting_PN.vert", "ColorPassthrough.frag");
-	g_VertexDiffuseColor = LoadProgram("DirVertexLighting_PCN.vert", "ColorPassthrough.frag");
-	g_WhiteAmbDiffuseColor = LoadProgram("DirAmbVertexLighting_PN.vert", "ColorPassthrough.frag");
-	g_VertexAmbDiffuseColor = LoadProgram("DirAmbVertexLighting_PCN.vert", "ColorPassthrough.frag");
+	g_WhiteDiffuseColor = LoadProgram("DirVertexLighting_PN.vert", "Tut09ColorPassthrough.frag");
+	g_VertexDiffuseColor = LoadProgram("DirVertexLighting_PCN.vert", "Tut09ColorPassthrough.frag");
+	g_WhiteAmbDiffuseColor = LoadProgram("DirAmbVertexLighting_PN.vert", "Tut09ColorPassthrough.frag");
+	g_VertexAmbDiffuseColor = LoadProgram("DirAmbVertexLighting_PCN.vert", "Tut09ColorPassthrough.frag");
 }
 
 Framework::Mesh *g_pCylinderMesh = NULL;
@@ -136,8 +136,8 @@ void init()
 
 	try
 	{
-		g_pCylinderMesh = new Framework::Mesh("UnitCylinder.xml");
-		g_pPlaneMesh = new Framework::Mesh("LargePlane.xml");
+		g_pCylinderMesh = new Framework::Mesh("Tut09UnitCylinder.xml");
+		g_pPlaneMesh = new Framework::Mesh("Tut09LargePlane.xml");
 	}
 	catch(std::exception &except)
 	{
@@ -199,10 +199,10 @@ void display()
 		{
 			glUseProgram(whiteDiffuse.theProgram);
 			glUniform4f(whiteDiffuse.lightIntensityUnif, 0.8f, 0.8f, 0.8f, 1.0f);
-			glUniform4f(whiteDiffuse.ambientIntensityUnif, 0.2f, 0.2f, 0.2f, 1.0f);
+			glUniform4f(whiteDiffuse.ambientIntensityUnif, 1.0f, 1.0f, 1.0f, 1.0f);
 			glUseProgram(vertexDiffuse.theProgram);
 			glUniform4f(vertexDiffuse.lightIntensityUnif, 0.8f, 0.8f, 0.8f, 1.0f);
-			glUniform4f(vertexDiffuse.ambientIntensityUnif, 0.2f, 0.2f, 0.2f, 1.0f);
+			glUniform4f(vertexDiffuse.ambientIntensityUnif, 10.0f, 10.0f, 10.0f, 1.0f);
 		}
 		else
 		{
