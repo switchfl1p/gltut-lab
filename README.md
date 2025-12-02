@@ -11,6 +11,12 @@ in root for clangd support
 ln -s build/compile_commands.json .
 ```
 
+for fedora:
+
+```
+sudo dnf install libXi-devel libX11-devel libXrandr-devel libXcursor-devel libXinerama-devel
+```
+
 some issue with glsdk when cloning, copy it from original version
 
 
