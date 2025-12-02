@@ -71,3 +71,7 @@ add_tutorial("Tut 08 Getting Oriented" "Tut08Ex1" "Ex1.cpp")
 add_tutorial("Tut 09 Lights on" "Tut09BasicLighting" "BasicLighting.cpp")
 add_tutorial("Tut 09 Lights on" "Tut09ScaleAndLighting" "ScaleAndLighting.cpp")
 add_tutorial("Tut 09 Lights on" "Tut09AmbientLighting" "AmbientLighting.cpp")
+
+add_tutorial("Tut 10 Plane Lights" "Tut10VertexPointLighting" "VertexPointLighting.cpp")
+add_tutorial("Tut 10 Plane Lights" "Tut10FragmentPointLighting" "FragmentPointLighting.cpp")
+add_tutorial("Tut 10 Plane Lights" "Tut10FragmentAttenuation" "FragmentAttenuation.cpp")
